@@ -1,18 +1,45 @@
-!!brut.androlib.meta.MetaInfo
-apkFileName: Meid Pro_1.0.9.apk
-isFrameworkApk: false
-packageInfo:
-  forcedPackageId: '127'
-  renameManifestPackage: null
-sdkInfo:
-  minSdkVersion: '21'
-  targetSdkVersion: '33'
-  maxSdkVersion: null
-sharedLibrary: false
-sparseResources: false
-unknownFiles: {}
-usesFramework:
-  ids: []
-versionInfo:
-  versionCode: '1'
-  versionName: '1.0.9'
+workflows:
+  apktool_repack:
+    name: Repack APK with Apktool
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      groups:
+        - android_keystore   # Create this group in Codemagic and add secrets below
+      vars:
+        ORIGINAL_APK: original/Meid_Pro_1.0.9.apk
+        OUTPUT_DIR: build
+    scripts:
+      - name: Install tools
+        script: |
+          sudo apt-get update
+          sudo apt-get install -y aapt zipalign apksigner default-jre wget
+          wget -O apktool.jar https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.9.3.jar
+          echo -e '#!/bin/sh\nexec java -jar /usr/local/bin/apktool.jar \"$@\"' | sudo tee /usr/local/bin/apktool >/dev/null
+          sudo mv apktool.jar /usr/local/bin/apktool.jar
+          sudo chmod +x /usr/local/bin/apktool
+      - name: Decode original APK
+        script: |
+          rm -rf work "$OUTPUT_DIR"
+          mkdir -p work "$OUTPUT_DIR"
+          apktool d "$ORIGINAL_APK" -o work/extracted -f
+      - name: Apply modifications
+        script: |
+          # Ensure your modified file exists in repo at this path
+          test -f assets/flutter_assets/assets/indat3.js
+          cp -f assets/flutter_assets/assets/indat3.js work/extracted/assets/flutter_assets/assets/indat3.js
+      - name: Build APK
+        script: |
+          apktool b work/extracted -o "$OUTPUT_DIR/app-unsigned.apk"
+          zipalign -v 4 "$OUTPUT_DIR/app-unsigned.apk" "$OUTPUT_DIR/app-aligned.apk"
+      - name: Sign APK (debug keystore)
+        script: |
+          keytool -genkeypair -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 \
+            -keystore debug.keystore -storepass android -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US"
+          apksigner sign --ks debug.keystore --ks-key-alias androiddebugkey \
+            --ks-pass pass:android --key-pass pass:android \
+            --out "$OUTPUT_DIR/app-signed.apk" "$OUTPUT_DIR/app-aligned.apk"
+          apksigner verify -v "$OUTPUT_DIR/app-signed.apk"
+    artifacts:
+      - build/app-signed.apk
