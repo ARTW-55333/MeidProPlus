@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Free Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .script-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .script-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .button.success {
+            background: #28a745;
+        }
+        .button.danger {
+            background: #dc3545;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Energy Free Purchase Scripts</h1>
+        <p>These scripts make energy/turn purchases cost 0 diamonds in the mini game app.</p>
+        
+        <div class="script-section">
+            <div class="script-title">📁 Basic Script: energy_free.js</div>
+            <p>Basic version that intercepts common energy purchase functions.</p>
+            <div class="code-block">
+&lt;script src="energy_free.js"&gt;&lt;/script&gt;
+            </div>
+            <button class="button" onclick="loadBasicScript()">Load Basic Script</button>
+            <button class="button success" onclick="testBasicScript()">Test Basic Script</button>
+            <button class="button danger" onclick="disableBasicScript()">Disable Basic Script</button>
+            <div id="basic-status"></div>
+        </div>
+        
+        <div class="script-section">
+            <div class="script-title">🚀 Advanced Script: energy_free_advanced.js</div>
+            <p>Advanced version that specifically targets the APIMgr class structure found in the game.</p>
+            <div class="code-block">
+&lt;script src="energy_free_advanced.js"&gt;&lt;/script&gt;
+            </div>
+            <button class="button" onclick="loadAdvancedScript()">Load Advanced Script</button>
+            <button class="button success" onclick="testAdvancedScript()">Test Advanced Script</button>
+            <button class="button danger" onclick="disableAdvancedScript()">Disable Advanced Script</button>
+            <div id="advanced-status"></div>
+        </div>
+        
+        <div class="script-section">
+            <div class="script-title">🔧 Manual Control</div>
+            <p>Control the scripts manually using the console or these buttons:</p>
+            <button class="button" onclick="enableAll()">Enable All Scripts</button>
+            <button class="button danger" onclick="disableAll()">Disable All Scripts</button>
+            <button class="button" onclick="checkStatus()">Check Status</button>
+            <div id="manual-status"></div>
+        </div>
+        
+        <div class="script-section">
+            <div class="script-title">📋 Installation Instructions</div>
+            <ol>
+                <li><strong>Copy the script files</strong> to your game assets folder</li>
+                <li><strong>Include in your HTML</strong> before the game scripts:</li>
+                <div class="code-block">
+&lt;!-- Load before game scripts --&gt;
+&lt;script src="energy_free.js"&gt;&lt;/script&gt;
+&lt;script src="energy_free_advanced.js"&gt;&lt;/script&gt;
+
+&lt;!-- Your game scripts here --&gt;
+&lt;script src="game.js"&gt;&lt;/script&gt;
+                </div>
+                <li><strong>Or load dynamically</strong> after the game loads:</li>
+                <div class="code-block">
+// Load the script dynamically
+const script = document.createElement('script');
+script.src = 'energy_free_advanced.js';
+document.head.appendChild(script);
+                </div>
+            </ol>
+        </div>
+        
+        <div class="script-section">
+            <div class="script-title">🎯 How It Works</div>
+            <ul>
+                <li>Intercepts the <code>buyTurn</code> function in the APIMgr class</li>
+                <li>Replaces it with a version that returns free energy</li>
+                <li>Maintains the same response structure but with 0 diamond cost</li>
+                <li>Works with both debug and production modes</li>
+                <li>Automatically detects and intercepts multiple function locations</li>
+            </ul>
+        </div>
+        
+        <div class="script-section">
+            <div class="script-title">⚠️ Important Notes</div>
+            <ul>
+                <li>These scripts are for educational and fair play purposes only</li>
+                <li>Always respect game rules and terms of service</li>
+                <li>The scripts can be easily disabled using the provided functions</li>
+                <li>Original functions are preserved and can be restored</li>
+                <li>Test thoroughly before using in production</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Status update functions
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        // Load basic script
+        function loadBasicScript() {
+            if (!window.EnergyFree) {
+                const script = document.createElement('script');
+                script.src = 'energy_free.js';
+                script.onload = () => {
+                    updateStatus('basic-status', '✅ Basic script loaded successfully!', 'success');
+                };
+                script.onerror = () => {
+                    updateStatus('basic-status', '❌ Failed to load basic script', 'error');
+                };
+                document.head.appendChild(script);
+            } else {
+                updateStatus('basic-status', '✅ Basic script already loaded', 'success');
+            }
+        }
+        
+        // Test basic script
+        function testBasicScript() {
+            if (window.EnergyFree) {
+                window.EnergyFree.status();
+                updateStatus('basic-status', '✅ Basic script is active and working', 'success');
+            } else {
+                updateStatus('basic-status', '❌ Basic script not loaded', 'error');
+            }
+        }
+        
+        // Disable basic script
+        function disableBasicScript() {
+            if (window.EnergyFree) {
+                window.EnergyFree.disable();
+                updateStatus('basic-status', '✅ Basic script disabled', 'success');
+            } else {
+                updateStatus('basic-status', '❌ Basic script not loaded', 'error');
+            }
+        }
+        
+        // Load advanced script
+        function loadAdvancedScript() {
+            if (!window.EnergyFreeAdvanced) {
+                const script = document.createElement('script');
+                script.src = 'energy_free_advanced.js';
+                script.onload = () => {
+                    updateStatus('advanced-status', '✅ Advanced script loaded successfully!', 'success');
+                };
+                script.onerror = () => {
+                    updateStatus('advanced-status', '❌ Failed to load advanced script', 'error');
+                };
+                document.head.appendChild(script);
+            } else {
+                updateStatus('advanced-status', '✅ Advanced script already loaded', 'success');
+            }
+        }
+        
+        // Test advanced script
+        function testAdvancedScript() {
+            if (window.EnergyFreeAdvanced) {
+                window.EnergyFreeAdvanced.status();
+                updateStatus('advanced-status', '✅ Advanced script is active and working', 'success');
+            } else {
+                updateStatus('advanced-status', '❌ Advanced script not loaded', 'error');
+            }
+        }
+        
+        // Disable advanced script
+        function disableAdvancedScript() {
+            if (window.EnergyFreeAdvanced) {
+                window.EnergyFreeAdvanced.disable();
+                updateStatus('advanced-status', '✅ Advanced script disabled', 'success');
+            } else {
+                updateStatus('advanced-status', '❌ Advanced script not loaded', 'error');
+            }
+        }
+        
+        // Enable all scripts
+        function enableAll() {
+            if (window.EnergyFree) window.EnergyFree.enable();
+            if (window.EnergyFreeAdvanced) window.EnergyFreeAdvanced.enable();
+            updateStatus('manual-status', '✅ All scripts enabled', 'success');
+        }
+        
+        // Disable all scripts
+        function disableAll() {
+            if (window.EnergyFree) window.EnergyFree.disable();
+            if (window.EnergyFreeAdvanced) window.EnergyFreeAdvanced.disable();
+            updateStatus('manual-status', '✅ All scripts disabled', 'success');
+        }
+        
+        // Check status
+        function checkStatus() {
+            let status = '📊 Script Status:\n';
+            status += window.EnergyFree ? '✅ Basic script: Loaded\n' : '❌ Basic script: Not loaded\n';
+            status += window.EnergyFreeAdvanced ? '✅ Advanced script: Loaded\n' : '❌ Advanced script: Not loaded\n';
+            
+            updateStatus('manual-status', status.replace(/\n/g, '<br>'), 'info');
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatus('basic-status', '⏳ Ready to load scripts', 'info');
+            updateStatus('advanced-status', '⏳ Ready to load scripts', 'info');
+            updateStatus('manual-status', '⏳ Ready to control scripts', 'info');
+        });
+    </script>
+</body>
+</html>
